@@ -1,64 +1,63 @@
 import { useState } from "react";
-import "./sign-up-form.styles.scss";
+import "./sign-in-form.styles.scss";
 import {
   createAuthUserWithEmailAndPassword,
+  signInWithGoogle,
   createUserDocumentFromAuth,
+  signInUserWithEmailAndPassword
 } from "../../utils/firebase/firebase.utils";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
 const defaultFormFields = {
-  UserName: "",
   email: "",
-  password: "",
-  confirmPassword: "",
+  password: ""
 };
-const SignUpForm = () => {
+const SignInForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
-  const { UserName, email, password, confirmPassword } = formFields;
+  const { email, password } = formFields;
+
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
-  const handleSubmit = async (event) => {
+
+  const signInWithGoogle = async () => {
+    const { user } = await signInWithGooglePopup();
+    const userDocRef = await createUserDocumentFromAuth(user);
+  };
+
+  const handleSubmit = async event => {
     event.preventDefault();
-    if (password != confirmPassword) {
-      alert("passwords do not mathc");
-      return;
-    }
 
     try {
-      const { user } = createAuthUserWithEmailAndPassword(email, password);
-      await createUserDocumentFromAuth(user, { UserName });
+      const response = await signInAuthUserWithEmailAndPassword(
+        email,
+        password
+      );
       resetFormFields();
     } catch (error) {
-      if ((error.code = "auth/email-already-in-use")) {
-        alert("Cannot create user, email already in use");
-      } else {
-        console.log(error);
+      switch (error.code) {
+        case "auth/wrong-password":
+          alert("Wrong password");
+          break;
+        case "auth/user-not-found":
+          alert("wrong user-name");
+        default:
+          console.log(error);
       }
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = event => {
     const { name, value } = event.target;
     setFormFields({ ...formFields, [name]: value });
   };
 
   return (
     <div className="sign-up-container">
-      <h2>Don't have an account?</h2>
-      <span>Sign-Up with email </span>
+      <h2>Already have an account?</h2>
+      <span>Sign-In with email </span>
       <form onSubmit={handleSubmit}>
-        <label>User Name</label>
-        <FormInput
-          label="User Name"
-          type="text"
-          required
-          onChange={handleChange}
-          name="UserName"
-          value={UserName}
-        />
-
         <label>Email</label>
         <FormInput
           label="Email"
@@ -78,21 +77,15 @@ const SignUpForm = () => {
           name="password"
           value={password}
         />
-
-        <label>Confirm Password</label>
-        <FormInput
-          label="Confirm Password"
-          type="password"
-          required
-          onChange={handleChange}
-          name="confirmPassword"
-          value={confirmPassword}
-        />
-
-        <Button type="submit">Submit </Button>
+        <div className="buttons-container">
+          <Button type="submit">Submit </Button>
+          <Button type="button" buttonTypa="google" onClick={signInWithGoogle}>
+            {" "}
+          </Button>
+        </div>
       </form>
     </div>
   );
 };
 
-export default SignUpForm;
+export default SignInForm;
