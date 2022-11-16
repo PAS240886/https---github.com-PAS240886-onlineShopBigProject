@@ -3,6 +3,7 @@ import "./sign-up-form.styles.scss";
 import {
   createAuthUserWithEmailAndPassword,
   createUserDocumentFromAuth,
+
 } from "../../utils/firebase/firebase.utils";
 import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
@@ -11,7 +12,7 @@ const defaultFormFields = {
   UserName: "",
   email: "",
   password: "",
-  confirmPassword: "",
+  confirmPassword: ""
 };
 const SignUpForm = () => {
   const [formFields, setFormFields] = useState(defaultFormFields);
@@ -19,7 +20,7 @@ const SignUpForm = () => {
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     event.preventDefault();
     if (password != confirmPassword) {
       alert("passwords do not mathc");
@@ -39,7 +40,7 @@ const SignUpForm = () => {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = event => {
     const { name, value } = event.target;
     setFormFields({ ...formFields, [name]: value });
   };
